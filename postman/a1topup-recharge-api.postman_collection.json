@@ -1,0 +1,12 @@
+{
+  "info": { "name": "A1Topup Recharge API", "description": "Recharge, Balance and Status APIs. Set the variables username and pwd to your A1Topup API credentials. Docs: https://a1topup.com/api/recharge-api-integration", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [ { "key": "base", "value": "https://business.a1topup.com/recharge" }, { "key": "username", "value": "YOUR_USERNAME" }, { "key": "pwd", "value": "YOUR_PASSWORD" } ],
+  "item": [
+    { "name": "Recharge (mobile / DTH / postpaid / utility)", "request": { "method": "GET", "url": { "raw": "{{base}}/api?username={{username}}&pwd={{pwd}}&circlecode=2&operatorcode=A&number=9800000000&amount=10&orderid=ORD1001&format=json",
+      "host": ["{{base}}"], "path": ["api"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"circlecode","value":"2"}, {"key":"operatorcode","value":"A"}, {"key":"number","value":"9800000000"}, {"key":"amount","value":"10"}, {"key":"orderid","value":"ORD1001"}, {"key":"format","value":"json"} ] } } },
+    { "name": "Balance", "request": { "method": "GET", "url": { "raw": "{{base}}/balance?username={{username}}&pwd={{pwd}}&format=json",
+      "host": ["{{base}}"], "path": ["balance"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"format","value":"json"} ] } } },
+    { "name": "Status (by your order id)", "request": { "method": "GET", "url": { "raw": "{{base}}/status?username={{username}}&pwd={{pwd}}&orderid=ORD1001&format=json",
+      "host": ["{{base}}"], "path": ["status"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"orderid","value":"ORD1001"}, {"key":"format","value":"json"} ] } } }
+  ]
+}
