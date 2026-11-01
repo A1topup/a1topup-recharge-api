@@ -1,12 +1,403 @@
 {
-  "info": { "name": "A1Topup Recharge API", "description": "Recharge, Balance and Status APIs. Set the variables username and pwd to your A1Topup API credentials. Docs: https://a1topup.com/api/recharge-api-integration", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
-  "variable": [ { "key": "base", "value": "https://business.a1topup.com/recharge" }, { "key": "username", "value": "YOUR_USERNAME" }, { "key": "pwd", "value": "YOUR_PASSWORD" } ],
+  "info": {
+    "name": "A1Topup Recharge API",
+    "description": "Docs: https://a1topup.com/api/recharge-api-integration \u00b7 GitHub: https://github.com/A1topup/a1topup-recharge-api \u00b7 Support: WhatsApp +91 91610 19161. Your server IP must be whitelisted. Never share real credentials.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
   "item": [
-    { "name": "Recharge (mobile / DTH / postpaid / utility)", "request": { "method": "GET", "url": { "raw": "{{base}}/api?username={{username}}&pwd={{pwd}}&circlecode=2&operatorcode=A&number=9800000000&amount=10&orderid=ORD1001&format=json",
-      "host": ["{{base}}"], "path": ["api"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"circlecode","value":"2"}, {"key":"operatorcode","value":"A"}, {"key":"number","value":"9800000000"}, {"key":"amount","value":"10"}, {"key":"orderid","value":"ORD1001"}, {"key":"format","value":"json"} ] } } },
-    { "name": "Balance", "request": { "method": "GET", "url": { "raw": "{{base}}/balance?username={{username}}&pwd={{pwd}}&format=json",
-      "host": ["{{base}}"], "path": ["balance"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"format","value":"json"} ] } } },
-    { "name": "Status (by your order id)", "request": { "method": "GET", "url": { "raw": "{{base}}/status?username={{username}}&pwd={{pwd}}&orderid=ORD1001&format=json",
-      "host": ["{{base}}"], "path": ["status"], "query": [ {"key":"username","value":"{{username}}"}, {"key":"pwd","value":"{{pwd}}"}, {"key":"orderid","value":"ORD1001"}, {"key":"format","value":"json"} ] } } }
+    {
+      "name": "Authentication",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/authentication?username={{username}}&pwd={{password}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "authentication"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            }
+          ]
+        },
+        "description": "Check your API username and password."
+      },
+      "response": []
+    },
+    {
+      "name": "Recharge (mobile / DTH / postpaid / bills)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api?username={{username}}&pwd={{password}}&circlecode={{circlecode}}&operatorcode={{operatorcode}}&number={{number}}&amount={{amount}}&orderid={{orderid}}&value1=&format=json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "circlecode",
+              "value": "{{circlecode}}"
+            },
+            {
+              "key": "operatorcode",
+              "value": "{{operatorcode}}"
+            },
+            {
+              "key": "number",
+              "value": "{{number}}"
+            },
+            {
+              "key": "amount",
+              "value": "{{amount}}"
+            },
+            {
+              "key": "orderid",
+              "value": "{{orderid}}"
+            },
+            {
+              "key": "value1",
+              "value": ""
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "description": "Use a new orderid for every recharge. Minimum amount 10. value1 only for billers that need it. Response txid = A1Topup transaction id, orderid = your id."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "try { const j = pm.response.json(); pm.test('Has status', () => pm.expect(j).to.have.property('status')); } catch (e) {}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Balance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/balance?username={{username}}&pwd={{password}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "balance"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            }
+          ]
+        },
+        "description": "Wallet balance."
+      },
+      "response": []
+    },
+    {
+      "name": "Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/status?username={{username}}&pwd={{password}}&orderid={{orderid}}&format=json",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "status"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "orderid",
+              "value": "{{orderid}}"
+            },
+            {
+              "key": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "description": "Status by your orderid. Use this instead of re-sending a pending recharge."
+      },
+      "response": []
+    },
+    {
+      "name": "Get transactions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/getTransaction?username={{username}}&pwd={{password}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "getTransaction"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            }
+          ]
+        },
+        "description": "Latest 50 transactions."
+      },
+      "response": []
+    },
+    {
+      "name": "Add balance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/addBalance?username={{username}}&pwd={{password}}&OthersId={{others_id}}&amount={{amount}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "addBalance"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "OthersId",
+              "value": "{{others_id}}"
+            },
+            {
+              "key": "amount",
+              "value": "{{amount}}"
+            }
+          ]
+        },
+        "description": "Transfer balance to another user."
+      },
+      "response": []
+    },
+    {
+      "name": "Revert balance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/revertBalance?username={{username}}&pwd={{password}}&OthersId={{others_id}}&amount={{amount}}&OPT={{opt}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "revertBalance"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "OthersId",
+              "value": "{{others_id}}"
+            },
+            {
+              "key": "amount",
+              "value": "{{amount}}"
+            },
+            {
+              "key": "OPT",
+              "value": "{{opt}}"
+            }
+          ]
+        },
+        "description": "Reverse a balance transfer."
+      },
+      "response": []
+    },
+    {
+      "name": "Change password",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/change_pwd?username={{username}}&pwd={{password}}&oldpwd={{password}}&newpwd={{new_password}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "change_pwd"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "oldpwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "newpwd",
+              "value": "{{new_password}}"
+            }
+          ]
+        },
+        "description": "Change your API password."
+      },
+      "response": []
+    },
+    {
+      "name": "Complaint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/complain?username={{username}}&pwd={{password}}&mobile={{number}}&amount={{amount}}&txid={{txid}}&message=Recharge not received",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "complain"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "pwd",
+              "value": "{{password}}"
+            },
+            {
+              "key": "mobile",
+              "value": "{{number}}"
+            },
+            {
+              "key": "amount",
+              "value": "{{amount}}"
+            },
+            {
+              "key": "txid",
+              "value": "{{txid}}"
+            },
+            {
+              "key": "message",
+              "value": "Recharge not received"
+            }
+          ]
+        },
+        "description": "Register a complaint for a transaction."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://business.a1topup.com/recharge"
+    },
+    {
+      "key": "username",
+      "value": "YOUR_USERNAME"
+    },
+    {
+      "key": "password",
+      "value": "YOUR_PASSWORD"
+    },
+    {
+      "key": "circlecode",
+      "value": "2"
+    },
+    {
+      "key": "operatorcode",
+      "value": "RC"
+    },
+    {
+      "key": "number",
+      "value": "9800000000"
+    },
+    {
+      "key": "amount",
+      "value": "10"
+    },
+    {
+      "key": "orderid",
+      "value": "ORD1001"
+    },
+    {
+      "key": "others_id",
+      "value": "OTHER_USER_ID"
+    },
+    {
+      "key": "opt",
+      "value": "OPT_VALUE"
+    },
+    {
+      "key": "new_password",
+      "value": "NEW_PASSWORD"
+    },
+    {
+      "key": "txid",
+      "value": "TXN_ID"
+    }
   ]
 }

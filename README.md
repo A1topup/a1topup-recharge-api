@@ -17,7 +17,9 @@ Official examples for the **[A1Topup Recharge API](https://a1topup.com/mobile-re
 
 ## Endpoints
 
-Base URL: `https://business.a1topup.com/recharge` · GET or POST · response `format`: `csv` (default), `json` or `xml`
+Base URL: `https://business.a1topup.com/recharge` · GET or POST (**POST recommended** in production) · `format`: `json`, `xml` or `csv`
+
+**Before you start:** your server's public IP must be whitelisted on your account (otherwise you get `Invalid IP`). Minimum recharge amount is **₹10**. There is no separate sandbox: test with a ₹10 live recharge.
 
 ### Recharge – `/api`
 
@@ -31,15 +33,17 @@ Base URL: `https://business.a1topup.com/recharge` · GET or POST · response `fo
 | `amount` | Yes | Recharge amount | 10 |
 | `orderid` | Yes | Your unique order id | ORD1001 |
 | `format` | Yes | csv, json or xml | json |
-| `value1`, `value2` | Billers only | Extra values for landline, gas, electricity, insurance | see below |
+| `value1` | Billers only | Extra value for landline, gas, electricity, insurance | see below |
 
 ```json
 { "txid": "5804", "status": "Success", "opid": "RJ0317161622000269New", "number": "9800000000", "amount": "10", "orderid": "ORD1001" }
 ```
 CSV: `txid,status,opid,number,amount,orderid`
 
+> In the recharge and status responses, **`txid` is the A1Topup transaction ID** and **`orderid` is your own order id**.
+
 ### Balance – `/balance`
-`username`, `pwd`, `format`
+`username`, `pwd`
 
 ```json
 { "status": "success", "balance": "1542.50", "currency": "INR" }
@@ -49,32 +53,37 @@ CSV: `txid,status,opid,number,amount,orderid`
 `username`, `pwd`, `orderid` (the same id you sent with the recharge), `format`
 
 ```json
-{ "status": "Success", "txid": "5804", "opid": "RJ0317161622000269New", "number": "9800000000", "amount": "10", "orderid": "ORD1001", "timestamp": "2026-11-02 10:30:05" }
+{ "status": "Success", "txid": "5804", "opid": "RJ0317161622000269New", "number": "9800000000", "amount": "10", "orderid": "ORD1001" }
 ```
 
-### Callback – called on **your** URL
-When a pending recharge gets its final status, A1Topup calls your URL, for example
-`https://yourdomain.com/callback.php?txid=ORDER_ID&status=Success&opid=OPERATOR_ID`
+### Callback – called on **your** URL (GET)
+
+When a recharge gets its final status, A1Topup calls the callback URL saved on your account with GET parameters:
+
+```
+https://yourdomain.com/callback.php?txid=ORD1001&status=Success&opid=RJ0317161622000269New
+https://yourdomain.com/callback.php?txid=ORD1001&status=Failure&opid=Failed
+```
 
 | Parameter | Meaning |
 | --- | --- |
-| `txid` | Your order id |
-| `status` | Success or Failure |
-| `opid` | Operator reference |
+| `txid` | **Your original `orderid`** (not the A1Topup transaction id). Match it against your orders. |
+| `status` | `Success` or `Failure` |
+| `opid` | Operator reference on success, or a failure message |
 
-Share your server IP and callback URL with the A1Topup team to get whitelisted.
+Notes: callbacks are sent for Success and Failure only (not for Pending). If a callback doesn't arrive, check the order with the Status API. Share your callback URL with the A1Topup team.
 
-### Extra values for bills (`value1`, `value2`)
+### Extra value for bills (`value1`)
 
-| Biller | number | value1 | value2 |
-| --- | --- | --- | --- |
-| Airtel Landline | Landline number | STD code | – |
-| BSNL Landline | Landline number | STD code | Account number |
-| MTNL Delhi Landline | Landline number | CA number | – |
-| Mahanagar Gas | Customer account number | Bill group number | – |
-| MSEDC - Maharashtra | Consumer number | Billing unit | Processing cycle |
-| Reliance Energy - Mumbai | Account number | Cycle number | – |
-| Insurance | Policy number | Date of birth (DD-MM-YYYY) | – |
+| Biller | number | value1 |
+| --- | --- | --- |
+| Airtel Landline | Landline number | STD code |
+| BSNL Landline | Landline number | STD code |
+| MTNL Delhi Landline | Landline number | CA number |
+| Mahanagar Gas | Customer account number | Bill group number |
+| MSEDC - Maharashtra | Consumer number | Billing unit |
+| Reliance Energy - Mumbai | Account number | Cycle number |
+| Insurance | Policy number | Date of birth (DD-MM-YYYY) |
 
 ### Common operator codes
 
@@ -101,6 +110,42 @@ Electricity, gas, insurance, FASTag and voucher codes (120+): see the [full oper
 | Mumbai | 3 | Madhya Pradesh | 16 | Kolkata | 6 |
 | Chennai | 7 | Maharashtra | 4 | North East | 26 |
 
+## Error messages
+
+| Message | Meaning |
+| --- | --- |
+| `Authentication fail!` | Wrong API username or password |
+| `Paramenter is missing` | A required parameter is missing |
+| `Error Code: 1001, Contact Service Provider` | Invalid operator code |
+| `Minimum amount 10 INR For Recharge.` | Amount below ₹10 |
+| `Low Balance` | Not enough wallet balance |
+| `Operator Down` | Operator temporarily unavailable |
+| `Service Unavailable` | Operator or amount blocked |
+| `Invalid IP [your IP]` | Your server IP is not whitelisted |
+| `Configuration is missing! contact service provider.` | Account API configuration missing |
+| `Already in pending process` | A pending recharge already exists for the same number and amount today |
+| `Unauthorised Access` | Your account is not enabled for API access |
+
+## All endpoints
+
+| Endpoint | Path | Parameters |
+| --- | --- | --- |
+| Authentication | `/authentication` | `username`, `pwd` |
+| Recharge | `/api` | `username`, `pwd`, `circlecode`, `operatorcode`, `number`, `amount`, `orderid`, `value1`, `format` |
+| Balance | `/balance` | `username`, `pwd` |
+| Status | `/status` | `username`, `pwd`, `orderid`, `format` |
+| Get transactions (latest 50) | `/getTransaction` | `username`, `pwd` |
+| Add balance (transfer to another user) | `/addBalance` | `username`, `pwd`, `OthersId`, `amount` |
+| Revert balance | `/revertBalance` | `username`, `pwd`, `OthersId`, `amount`, `OPT` |
+| Change password | `/change_pwd` | `username`, `pwd`, `oldpwd`, `newpwd` |
+| Complaint | `/complain` | `username`, `pwd`, `mobile`, `amount`, `txid`, `message` |
+
+All paths are relative to the base URL. Every request is checked against your whitelisted server IP.
+
+## Wallet and GST invoice
+
+Top up your wallet any number of times in a month; you receive **one consolidated GST invoice per month** with your company name and GSTIN.
+
 ## Quick start
 
 ```bash
@@ -125,7 +170,7 @@ Use a 60-second timeout. A timeout is treated as **pending**, not failed.
 ## Security checklist
 
 - Keep `username` and `pwd` on your server, never in an Android app or browser code
-- Use a unique `orderid` for every request
+- Use a unique `orderid` for every request (duplicate order ids are not blocked by the API, so your system must keep them unique)
 - Accept callbacks only for order ids you created that are still pending
 - Log every request and response
 
